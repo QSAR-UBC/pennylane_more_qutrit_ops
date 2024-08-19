@@ -547,6 +547,7 @@ class THadamard(Operation):
         new_exp = z % 4 if self.subspace is None else z % 2
         return super().pow(new_exp)
 
+
 class TCNOT(Operation):
     r"""TCNOT(wires, subspace)
     The ternary controlled-NOT operator
@@ -563,8 +564,6 @@ class TCNOT(Operation):
     Args:
         wires (Sequence[int] or int): the wire the operation acts on
         subspace (Sequence[int]): the 2D subspace on which to apply operation
-        do_queue (bool): Indicates whether the operator should be
-            immediately pushed into the Operator queue (optional)
     **Example**
     The specified subspace will determine which basis states the operation actually
     applies to:
@@ -599,6 +598,7 @@ class TCNOT(Operation):
            [0., 0., 0., 0., 0., 0., 0., 0., 1.],
            [0., 0., 0., 0., 0., 0., 0., 1., 0.]])
     """
+
     num_wires = 2
     num_params = 0
     """int: Number of trainable parameters that the operator depends on."""
@@ -606,9 +606,7 @@ class TCNOT(Operation):
     def label(self, decimals=None, base_label=None, cache=None):
         return base_label or "TX"
 
-    def __init__(
-        self, wires, subspace=[0, 1], do_queue=True
-    ):  # pylint: disable=dangerous-default-value
+    def __init__(self, wires, subspace=[0, 1]):
         if not hasattr(subspace, "__iter__"):
             raise ValueError(
                 "The subspace must be a sequence with two unique elements from the set {0, 1, 2}."
@@ -618,7 +616,7 @@ class TCNOT(Operation):
         self._hyperparameters = {
             "subspace": self.subspace,
         }
-        super().__init__(wires=wires, do_queue=do_queue)
+        super().__init__(wires=wires)
 
     @property
     def subspace(self):
@@ -695,8 +693,6 @@ class TX(Operation):
     Args:
         wires (Sequence[int] or int): the wire the operation acts on
         subspace (Sequence[int]): the 2D subspace on which to apply operation
-        do_queue (bool): Indicates whether the operator should be
-            immediately pushed into the Operator queue (optional)
 
     **Example**
 
@@ -718,6 +714,7 @@ class TX(Operation):
            [0., 0., 1.],
            [0., 1., 0.]])
     """
+
     num_wires = 1
     num_params = 0
     """int: Number of trainable parameters that the operator depends on."""
@@ -725,9 +722,7 @@ class TX(Operation):
     def label(self, decimals=None, base_label=None, cache=None):
         return base_label or "TX"
 
-    def __init__(
-        self, wires, subspace=[0, 1], do_queue=True
-    ):  # pylint: disable=dangerous-default-value
+    def __init__(self, wires, subspace=[0, 1]):
         if not hasattr(subspace, "__iter__"):
             raise ValueError(
                 "The subspace must be a sequence with two unique elements from the set {0, 1, 2}."
@@ -737,7 +732,7 @@ class TX(Operation):
         self._hyperparameters = {
             "subspace": self.subspace,
         }
-        super().__init__(wires=wires, do_queue=do_queue)
+        super().__init__(wires=wires)
 
     @property
     def subspace(self):
@@ -828,8 +823,6 @@ class TY(Operation):
     Args:
         wires (Sequence[int] or int): the wire the operation acts on
         subspace (Sequence[int]): the 2D subspace on which to apply operation
-        do_queue (bool): Indicates whether the operator should be
-            immediately pushed into the Operator queue (optional)
 
     **Example**
 
@@ -851,6 +844,7 @@ class TY(Operation):
            [ 0.+0.j,  0.+0.j, -0.-1.j],
            [ 0.+0.j,  0.+1.j,  0.+0.j]])
     """
+
     num_wires = 1
     num_params = 0
     """int: Number of trainable parameters that the operator depends on."""
@@ -858,9 +852,7 @@ class TY(Operation):
     def label(self, decimals=None, base_label=None, cache=None):
         return base_label or "TY"
 
-    def __init__(
-        self, wires, subspace=[0, 1], do_queue=True
-    ):  # pylint: disable=dangerous-default-value
+    def __init__(self, wires, subspace=[0, 1]):
         if not hasattr(subspace, "__iter__"):
             raise ValueError(
                 "The subspace must be a sequence with two unique elements from the set {0, 1, 2}."
@@ -870,7 +862,7 @@ class TY(Operation):
         self._hyperparameters = {
             "subspace": self.subspace,
         }
-        super().__init__(wires=wires, do_queue=do_queue)
+        super().__init__(wires=wires)
 
     @property
     def subspace(self):
@@ -960,8 +952,6 @@ class TZ(Operation):
     Args:
         wires (Sequence[int] or int): the wire the operation acts on
         subspace (Sequence[int]): the 2D subspace on which to apply operation
-        do_queue (bool): Indicates whether the operator should be
-            immediately pushed into the Operator queue (optional)
 
     **Example**
 
@@ -984,6 +974,7 @@ class TZ(Operation):
            [ 0., -1.,  0.],
            [ 0.,  0.,  1.]])
     """
+
     num_wires = 1
     num_params = 0
     """int: Number of trainable parameters that the operator depends on."""
@@ -991,9 +982,7 @@ class TZ(Operation):
     def label(self, decimals=None, base_label=None, cache=None):
         return base_label or "TZ"
 
-    def __init__(
-        self, wires, subspace=[0, 1], do_queue=True
-    ):  # pylint: disable=dangerous-default-value
+    def __init__(self, wires, subspace=[0, 1]):
         if not hasattr(subspace, "__iter__"):
             raise ValueError(
                 "The subspace must be a sequence with two unique elements from the set {0, 1, 2}."
@@ -1003,7 +992,7 @@ class TZ(Operation):
         self._hyperparameters = {
             "subspace": self.subspace,
         }
-        super().__init__(wires=wires, do_queue=do_queue)
+        super().__init__(wires=wires)
 
     @property
     def subspace(self):
@@ -1088,8 +1077,6 @@ class TH(Operation):
     Args:
         wires (Sequence[int] or int): the wire the operation acts on
         subspace (Sequence[int]): the 2D subspace on which to apply operation
-        do_queue (bool): Indicates whether the operator should be
-            immediately pushed into the Operator queue (optional)
 
     **Example**
 
@@ -1111,6 +1098,7 @@ class TH(Operation):
            [ 0.,  1.,  1.],
            [ 0.,  1., -1.]])
     """
+
     num_wires = 1
     num_params = 0
     """int: Number of trainable parameters that the operator depends on."""
@@ -1118,9 +1106,7 @@ class TH(Operation):
     def label(self, decimals=None, base_label=None, cache=None):
         return base_label or "TH"
 
-    def __init__(
-        self, wires, subspace=[0, 1], do_queue=True
-    ):  # pylint: disable=dangerous-default-value
+    def __init__(self, wires, subspace=[0, 1]):
         if not hasattr(subspace, "__iter__"):
             raise ValueError(
                 "The subspace must be a sequence with two unique elements from the set {0, 1, 2}."
@@ -1130,7 +1116,7 @@ class TH(Operation):
         self._hyperparameters = {
             "subspace": self.subspace,
         }
-        super().__init__(wires=wires, do_queue=do_queue)
+        super().__init__(wires=wires)
 
     @property
     def subspace(self):
@@ -1226,6 +1212,7 @@ class TS(Operation):
     Args:
         wires (Sequence[int] or int): the wire the operation acts on
     """
+
     num_wires = 1
     num_params = 0
     """int: Number of trainable parameters that the operator depends on."""
@@ -1279,6 +1266,7 @@ class TT(Operation):
     Args:
         wires (Sequence[int] or int): the wire the operation acts on
     """
+
     num_wires = 1
     num_params = 0
     """int: Number of trainable parameters that the operator depends on."""
