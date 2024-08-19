@@ -18,6 +18,7 @@ that do not depend on any parameters.
 # pylint:disable=arguments-differ
 import numpy as np
 
+import pennylane as qml
 from pennylane.operation import AdjointUndefinedError, Operation
 from pennylane.wires import Wires
 
@@ -1245,9 +1246,9 @@ class TS(Operation):
 
 
 class TT(Operation):
-    r"""TT(wires)
+    r"""TT(wires, subspace)
     The single qutrit T gate
-
+	If subspace is not specified, then
     The construction of this operator is based on definition 8 from
     `Yeh et al. (2022) <https://arxiv.org/abs/2204.00552>`_.
 
@@ -1271,8 +1272,33 @@ class TT(Operation):
     num_params = 0
     """int: Number of trainable parameters that the operator depends on."""
 
+    def __init__(self, wires, subspace=None):
+        if not hasattr(subspace, "__iter__"):
+            raise ValueError(
+                "The subspace must be a sequence with two unique elements from the set {0, 1, 2}."
+            )
+
+        self._subspace = subspace
+        self._hyperparameters = {
+            "subspace": self.subspace,
+        }
+        super().__init__(wires=wires)
+
+    @property
+    def subspace(self):
+        """The single-qutrit basis states which the operator acts on
+
+        This property returns the 2D subspace on which the operator acts. This subspace
+        determines which two single-qutrit basis states the operator acts on. The remaining
+        basis state is not affected by the operator.
+
+        Returns:
+            tuple[int]: subspace on which operator acts
+        """
+        return tuple(sorted(self._subspace))
+
     @staticmethod
-    def compute_matrix():  # pylint: disable=arguments-differ
+    def compute_matrix(subspace=None):  # pylint: disable=arguments-differ
         r"""Representation of the operator as a canonical matrix in the computational basis (static method).
 
         The canonical matrix is the textbook matrix representation that does not consider wires.
@@ -1290,9 +1316,18 @@ class TT(Operation):
                [0.        +0.j        , 0.76604444+0.64278761j, 0.        +0.j        ],
                [0.        +0.j        , 0.        +0.j        , 0.76604444-0.64278761j]])
         """
-        return np.diag([1, ZETA, ZETA**8])
+        if subspace is None:
+            return np.diag([1, ZETA, ZETA**8])
+
+        mat = np.eye(3, dtype=np.complex128)
+        mat[subspace[0], subspace[0]] = 1
+        mat[subspace[1], subspace[1]] = np.exp(-1j*np.pi/4)
+
+        return mat
+	
 
     def adjoint(self):
-        op = TT(wires=self.wires)
-        op.inverse = not self.inverse
-        return op
+        raise AdjointUndefinedError
+        # op = TT(wires=self.wires)
+        # op.inverse = not self.inverse
+        # return op
