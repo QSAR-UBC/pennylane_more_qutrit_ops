@@ -846,8 +846,8 @@ class Operator(abc.ABC, metaclass=ABCCaptureMeta):
             )
         ):
             return canonical_matrix
-
-        return expand_matrix(canonical_matrix, wires=self.wires, wire_order=wire_order)
+        qudit_dim = canonical_matrix.shape[-1]
+        return expand_matrix(canonical_matrix, wires=self.wires, wire_order=wire_order, qudit_dim=qudit_dim)
 
     @staticmethod
     def compute_sparse_matrix(
