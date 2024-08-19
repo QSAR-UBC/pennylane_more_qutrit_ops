@@ -42,6 +42,13 @@ __ops__ = {
     "TRY",
     "TRZ",
     "QutritBasisState",
+    "TCNOT",
+    "TT",
+    "TH",
+    "TX",
+    "TY",
+    "TZ",
+    "TS"
 }
 
 __obs__ = {

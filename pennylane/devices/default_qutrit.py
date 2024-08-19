@@ -91,6 +91,15 @@ class DefaultQutrit(QutritDevice):
         "TRY",
         "TRZ",
         "QutritBasisState",
+        "TCNOT",
+        "Adjoint(TT)",
+        "Adjoint(TS)",
+        "TX",
+        "TY",
+        "TZ",
+        "TH",
+        "TS",
+        "TT",
     }
 
     # Identity is supported as an observable for qml.state() to work correctly. However, any
