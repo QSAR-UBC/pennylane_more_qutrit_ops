@@ -224,12 +224,22 @@ def _permute_dense_matrix(matrix, wires, wire_order, batch_dim):
 
     # reshape matrix to match wire values e.g. mat[0, 0, 0, 0] = <00|mat|00>
     # with this reshape we can easily swap wires
-    shape = [batch_dim] + [2] * (num_wires * 2) if batch_dim else [2] * (num_wires * 2)
+
+    # qutrit hotfix: if matrix dimension is a power of 3, then assume qutrit
+    qudit_dim = 3
+    matrix_size = matrix.shape[0]
+    while (matrix_size%3 == 0):
+        matrix_size = matrix_size/3
+
+    if (matrix_size != 1):
+        qudit_dim = 2
+
+    shape = [batch_dim] + [qudit_dim] * (num_wires * 2) if batch_dim else [qudit_dim] * (num_wires * 2) 
     matrix = qml.math.reshape(matrix, shape)
     # transpose matrix
     matrix = qml.math.transpose(matrix, axes=perm)
     # reshape back
-    shape = [batch_dim] + [2**num_wires] * 2 if batch_dim else [2**num_wires] * 2
+    shape = [batch_dim] + [qudit_dim**num_wires] * 2 if batch_dim else [qudit_dim**num_wires] * 2
     return qml.math.reshape(matrix, shape)
 
 
