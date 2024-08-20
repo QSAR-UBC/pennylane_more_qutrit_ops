@@ -1357,7 +1357,7 @@ class TT(Operation):
 
         mat = np.eye(3, dtype=np.complex128)
         mat[subspace[0], subspace[0]] = 1
-        mat[subspace[1], subspace[1]] = np.exp(-1j*np.pi/4)
+        mat[subspace[1], subspace[1]] = np.exp(1j*np.pi/4)
 
         """ PHASE MATTERS """
         # mat[subspace[0], subspace[0]] = np.exp(-1j*np.pi/8)
