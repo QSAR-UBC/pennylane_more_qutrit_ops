@@ -23,6 +23,7 @@ from pennylane.operation import AdjointUndefinedError, Operation
 from pennylane.wires import Wires
 
 from .parametric_ops import validate_subspace
+import pennylane as qml
 
 OMEGA = np.exp(2 * np.pi * 1j / 3)
 ZETA = OMEGA ** (1 / 3)  # ZETA will be used as a phase for later non-parametric operations
