@@ -846,7 +846,16 @@ class Operator(abc.ABC, metaclass=ABCCaptureMeta):
             )
         ):
             return canonical_matrix
-        qudit_dim = int(np.exp(np.log(canonical_matrix.shape[-1])/len(self.wires)))
+
+
+        qudit_dim = 3
+        matrix_size = canonical_matrix.shape[0]
+        while (matrix_size%3 == 0):
+            matrix_size = matrix_size/3
+
+        if (matrix_size != 1):
+            qudit_dim = 2
+
         return expand_matrix(canonical_matrix, wires=self.wires, wire_order=wire_order, qudit_dim=qudit_dim)
 
     @staticmethod
