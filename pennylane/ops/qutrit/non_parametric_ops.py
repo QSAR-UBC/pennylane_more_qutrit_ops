@@ -1218,8 +1218,33 @@ class TS(Operation):
     num_params = 0
     """int: Number of trainable parameters that the operator depends on."""
 
+    def __init__(self, wires, subspace=None):
+        if not hasattr(subspace, "__iter__"):
+            raise ValueError(
+                "The subspace must be a sequence with two unique elements from the set {0, 1, 2}."
+            )
+
+        self._subspace = subspace
+        self._hyperparameters = {
+            "subspace": self.subspace,
+        }
+        super().__init__(wires=wires)
+
+    @property
+    def subspace(self):
+        """The single-qutrit basis states which the operator acts on
+
+        This property returns the 2D subspace on which the operator acts. This subspace
+        determines which two single-qutrit basis states the operator acts on. The remaining
+        basis state is not affected by the operator.
+
+        Returns:
+            tuple[int]: subspace on which operator acts
+        """
+        return tuple(sorted(self._subspace))
+
     @staticmethod
-    def compute_matrix():  # pylint: disable=arguments-differ
+    def compute_matrix(subspace = None):  # pylint: disable=arguments-differ
         r"""Representation of the operator as a canonical matrix in the computational basis (static method).
 
         The canonical matrix is the textbook matrix representation that does not consider wires.
@@ -1237,12 +1262,23 @@ class TS(Operation):
                [0.        +0.j        , 0.76604444-0.64278761j, 0.        +0.j        ],
                [0.        +0.j        , 0.        +0.j        , 0.17364818+0.98480775j]])
         """
-        return ZETA**8 * np.diag([1, 1, OMEGA])
+        if subspace is None:
+        	return ZETA**8 * np.diag([1, 1, OMEGA])
+
+        mat = np.eye(3, dtype=np.complex128)
+        mat[subspace[0], subspace[0]] = 1
+        mat[subspace[1], subspace[1]] = 1j
+        """ PHASE MATTERS """
+        # mat[subspace[0], subspace[0]] = np.exp(-1j*np.pi/4)
+        # mat[subspace[1], subspace[1]] = np.exp(1j*np.pi/4)
+
+        return mat
 
     def adjoint(self):
-        op = TS(wires=self.wires)
-        op.inverse = not self.inverse
-        return op
+        raise AdjointUndefinedError
+        # op = TS(wires=self.wires)
+        # op.inverse = not self.inverse
+        # return op
 
 
 class TT(Operation):
@@ -1322,6 +1358,10 @@ class TT(Operation):
         mat = np.eye(3, dtype=np.complex128)
         mat[subspace[0], subspace[0]] = 1
         mat[subspace[1], subspace[1]] = np.exp(-1j*np.pi/4)
+
+        """ PHASE MATTERS """
+        # mat[subspace[0], subspace[0]] = np.exp(-1j*np.pi/8)
+        # mat[subspace[1], subspace[1]] = np.exp(1j*np.pi/8)
 
         return mat
 	
