@@ -117,3 +117,75 @@ class QutritBasisState(StatePrepBase):
         ket = np.zeros((3,) * num_wires)
         ket[tuple(indices)] = 1
         return math.convert_like(ket, prep_vals)
+
+class QutritStateVector(StatePrepBase):
+
+    num_wires = AnyWires
+    num_params = 1
+    """int: Number of trainable parameters that the operator depends on."""
+
+    ndim_params = (1,)
+    """int: Number of dimensions per trainable parameter of the operator."""
+
+    def __init__(self, state, wires, id=None):
+        super().__init__(state, wires=wires, id=id)
+        state = self.parameters[0]
+
+        if len(state.shape) == 1:
+            state = math.reshape(state, (1, state.shape[0]))
+        if state.shape[1] != 3 ** len(self.wires):
+            raise ValueError("State vector must have shape (3**wires,) or (batch_size, 3**wires).")
+
+        param = math.cast(state, np.complex128)
+        if not math.is_abstract(param):
+            norm = math.linalg.norm(param, axis=-1, ord=2)
+            if not math.allclose(norm, 1.0, atol=1e-10):
+                raise ValueError("Sum of amplitudes-squared does not equal one.")
+
+    @staticmethod
+    def compute_decomposition(state, wires):
+        r"""Representation of the operator as a product of other operators (static method). :
+
+        .. math:: O = O_1 O_2 \dots O_n.
+
+
+        .. seealso:: :meth:`~.StatePrep.decomposition`.
+
+        Args:
+            state (array[complex]): a state vector of size 3**len(wires)
+            wires (Iterable, Wires): the wire(s) the operation acts on
+
+        Returns:
+            list[Operator]: decomposition into lower level operations
+
+        **Example:**
+
+        >>> qml.StatePrep.compute_decomposition(np.array([1, 0, 0, 0]), wires=range(2))
+        [MottonenStatePreparation(tensor([1, 0, 0, 0], requires_grad=True), wires=[0, 1])]
+
+        """
+        pass
+
+    def state_vector(self, wire_order=None):
+        num_op_wires = len(self.wires)
+        op_vector_shape = (-1,) + (3,) * num_op_wires if self.batch_size else (3,) * num_op_wires
+        op_vector = math.reshape(self.parameters[0], op_vector_shape)
+
+        if wire_order is None or Wires(wire_order) == self.wires:
+            return op_vector
+
+        wire_order = Wires(wire_order)
+        if not wire_order.contains_wires(self.wires):
+            raise WireError(f"Custom wire_order must contain all {self.name} wires")
+
+        # add zeros for each wire that isn't being set
+        extra_wires = Wires(set(wire_order) - set(self.wires))
+        for _ in extra_wires:
+            op_vector = math.stack([op_vector, math.zeros_like(op_vector)], axis=-1)
+
+        # transpose from operator wire order to provided wire order
+        current_wires = self.wires + extra_wires
+        transpose_axes = [current_wires.index(w) for w in wire_order]
+        if self.batch_size:
+            transpose_axes = [0] + [a + 1 for a in transpose_axes]
+        return math.transpose(op_vector, transpose_axes)

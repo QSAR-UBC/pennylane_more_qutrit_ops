@@ -42,6 +42,7 @@ __ops__ = {
     "TRY",
     "TRZ",
     "QutritBasisState",
+    "QutritStateVector",
     "TCNOT",
     "TT",
     "TH",

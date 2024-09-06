@@ -24,7 +24,7 @@ import logging
 import numpy as np
 
 import pennylane as qml  # pylint: disable=unused-import
-from pennylane import DeviceError, QutritBasisState, QutritDevice
+from pennylane import DeviceError, QutritBasisState, QutritDevice, QutritStateVector
 from pennylane.devices.default_qubit_legacy import _get_slice
 from pennylane.logging import debug_logger, debug_logger_init
 from pennylane.wires import WireError
@@ -91,6 +91,7 @@ class DefaultQutrit(QutritDevice):
         "TRY",
         "TRZ",
         "QutritBasisState",
+        "QutritStateVector",
         "TCNOT",
         "Adjoint(TT)",
         "Adjoint(TS)",
@@ -196,10 +197,13 @@ class DefaultQutrit(QutritDevice):
                     f"Operation {operation.name} cannot be used after other operations have already been applied "
                     f"on a {self.short_name} device."
                 )
-            if isinstance(operation, QutritBasisState):
+            if isinstance(operation, QutritStateVector):
+                self._apply_state_vector(operation)
+            elif isinstance(operation, QutritBasisState):
                 self._apply_basis_state(operation.parameters[0], operation.wires)
             else:
                 self._state = self._apply_operation(self._state, operation)
+
 
         # store the pre-rotated state
         self._pre_rotated_state = self._state
@@ -236,6 +240,20 @@ class DefaultQutrit(QutritDevice):
         num = int(qml.math.dot(state, basis_states))
 
         self._state = self._create_basis_state(num)
+
+    def _apply_state_vector(self, op):
+        """Initialize the state vector in a specified computational basis state.
+
+        Args:
+            state (array[int]): computational basis state of shape ``(wires,)``
+                consisting of 0s, 1s and 2s.
+            wires (Wires): wires that the provided computational state should be initialized on
+
+        Note: This function does not support broadcasted inputs yet.
+        """
+
+        #TODO: current hack only works for full wires in little-endian order
+        self._state = op.state_vector()
 
     def _apply_operation(self, state, operation):
         """Applies operations to the input state.
