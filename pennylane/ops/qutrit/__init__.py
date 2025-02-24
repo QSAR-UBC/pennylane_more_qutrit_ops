@@ -37,7 +37,6 @@ __ops__ = {
     "TClock",
     "TAdd",
     "TSWAP",
-    "THadamard",
     "TRX",
     "TRY",
     "TRZ",
@@ -49,7 +48,7 @@ __ops__ = {
     "TX",
     "TY",
     "TZ",
-    "TS"
+    "TS",
 }
 
 __obs__ = {
