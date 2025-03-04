@@ -539,7 +539,7 @@ class TCNOT(Operation):
         return mat
 
     def adjoint(self):
-        return TCNOT(wires=self.wires, subspace=self.subspace, control_values=self.control_values)
+        return TCNOT(wires=self.wires, subspace=self.subspace, control_value=self.control_value)
 
     def pow(self, z):
         if not isinstance(z, int):
